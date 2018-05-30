@@ -57,17 +57,22 @@ public class Connection extends MyThread implements IObservable {
 		fInputStream.close();
 	}
 	
-	public void sendFile(File file) {
+	public void sendUsersFile(File file) {
 		try {
 			output.writeUTF(Request.GET_FILE.toString());
-			byte[] array = new byte[(int) file.length()];
-			readFileBytes(file, array);
-			output.writeUTF(file.getName());
-			output.writeInt(array.length);
-			output.write(array);
+			sendFile(file);
 		} catch (IOException e) {
 			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
 		}
+	}
+	
+	private void sendFile(File file) throws IOException {
+		byte[] array = new byte[(int) file.length()];
+		readFileBytes(file, array);
+		output.writeUTF(file.getName());
+		output.writeInt(array.length);
+		output.write(array);
+
 	}
 
 	private void downloadFile() throws IOException {
@@ -81,6 +86,15 @@ public class Connection extends MyThread implements IObservable {
 		FileOutputStream fOutputStream = new FileOutputStream(file);
 		fOutputStream.write(array);
 		fOutputStream.close();
+	}
+	
+	public void shareFile(String filePath) {
+		try {
+			output.writeUTF(Request.SHARE_FILE.toString());
+			output.writeUTF(filePath);
+		} catch (IOException e) {
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
+		}
 	}
 	
 	private void managerRequest(String request) throws IOException {
@@ -97,8 +111,23 @@ public class Connection extends MyThread implements IObservable {
 			name = input.readUTF();
 			observer.update(this);
 			break;
-		default:
+		case DOWNLOAD_FILE:
+			downLoadShareFile(input.readUTF(), input.readUTF());
 			break;
+		case SHARE_FILE:
+			downloadFile();
+			break;
+		}
+	}
+	
+	private void downLoadShareFile(String userName, String fileName) {
+		observer.downloadFile(this, userName, fileName);
+		File file = new File(fileName);
+		try {
+			output.writeUTF(Request.DOWNLOAD_FILE.toString());
+			sendFile(file);
+		} catch (IOException e) {
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
 		}
 	}
 

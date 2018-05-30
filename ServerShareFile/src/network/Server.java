@@ -64,7 +64,17 @@ public class Server extends MyThread implements IObserver {
 	public void sendFileList(Connection connection, String userName) {
 		for (Connection user : connections) {
 			if (userName.equals(user.getName())) {
-				connection.sendFile(user.getFileList());
+				connection.sendUsersFile(user.getFileList());
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void downloadFile(Connection connection, String user, String fileName) {
+		for (Connection actual : connections) {
+			if (user.equals(actual.getName())) {
+				actual.shareFile(fileName);
 				break;
 			}
 		}

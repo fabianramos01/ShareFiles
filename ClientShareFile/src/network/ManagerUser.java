@@ -59,7 +59,7 @@ public class ManagerUser extends MyThread implements IObservable {
 		if (response.equals(Request.GET_FILE.toString())) {
 			user.setFileList(FileManager.loadFiles(file));
 			iObserver.userListFile();
-		} else {
+		} else if (response.equals(Request.USERS.toString())) {
 			user.setUsers(FileManager.loadFiles(file));
 			iObserver.newUser();
 		}
@@ -87,6 +87,12 @@ public class ManagerUser extends MyThread implements IObservable {
 		fInputStream.read(array);
 		fInputStream.close();
 	}
+	
+	public void downloadFile(String user, String fileName) throws IOException {
+		output.writeUTF(Request.DOWNLOAD_FILE.toString());
+		output.writeUTF(user);
+		output.writeUTF(fileName);
+	}
 
 	private void responseManager(String response) throws IOException {
 		switch (Request.valueOf(response)) {
@@ -99,9 +105,25 @@ public class ManagerUser extends MyThread implements IObservable {
 		case USERS:
 			getFile(response);
 			break;
-		default:
+		case DOWNLOAD_FILE:
+			getFile(response);
+			break;
+		case USER_NAME:
+			break;
+		case SHARE_FILE:
+			shareFile(input.readUTF());
 			break;
 		}
+	}
+
+	private void shareFile(String filePath) throws IOException {
+		output.writeUTF(Request.SHARE_FILE.toString());
+		File file = user.getFile(filePath);
+		byte[] array = new byte[(int) file.length()];
+		readFileBytes(file, array);
+		output.writeUTF(filePath);
+		output.writeInt(array.length);
+		output.write(array);
 	}
 
 	@Override
