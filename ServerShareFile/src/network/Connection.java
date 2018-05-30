@@ -1,0 +1,141 @@
+package network;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.logging.Level;
+
+import model.MyThread;
+import persistence.FileManager;
+
+public class Connection extends MyThread implements IObservable {
+
+	private static int count = 0;
+	private String name;
+	private IObserver observer;
+	private DataInputStream input;
+	private DataOutputStream output;
+	private Socket socket;
+	private File fileList;
+
+	public Connection(Socket socket) {
+		super(String.valueOf(count++), 1000);
+		this.socket = socket;
+		try {
+			input = new DataInputStream(this.socket.getInputStream());
+			output = new DataOutputStream(this.socket.getOutputStream());
+		} catch (IOException e) {
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
+		}
+		start();
+	}
+
+	public void sendUsers(String path, ArrayList<String> users) {
+		try {
+			output.writeUTF(Request.USERS.toString());
+			FileManager.saveFile(path, users);
+			File file = new File(path);
+			byte[] array = new byte[(int) file.length()];
+			readFileBytes(file, array);
+			output.writeUTF(file.getName());
+			output.writeInt(array.length);
+			output.write(array);
+			file.delete();
+		} catch (IOException e) {
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
+		}
+	}
+
+	private void readFileBytes(File file, byte[] array) throws IOException {
+		FileInputStream fInputStream = new FileInputStream(file);
+		fInputStream.read(array);
+		fInputStream.close();
+	}
+	
+	public void sendFile(File file) {
+		try {
+			output.writeUTF(Request.GET_FILE.toString());
+			byte[] array = new byte[(int) file.length()];
+			readFileBytes(file, array);
+			output.writeUTF(file.getName());
+			output.writeInt(array.length);
+			output.write(array);
+		} catch (IOException e) {
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
+		}
+	}
+
+	private void downloadFile() throws IOException {
+		fileList = new File(name + "-" + input.readUTF());
+		byte[] fileArray = new byte[input.readInt()];
+		input.readFully(fileArray);
+		writeFile(fileList, fileArray);
+	}
+	
+	private void writeFile(File file, byte[] array) throws IOException {
+		FileOutputStream fOutputStream = new FileOutputStream(file);
+		fOutputStream.write(array);
+		fOutputStream.close();
+	}
+	
+	private void managerRequest(String request) throws IOException {
+		switch (Request.valueOf(request)) {
+		case GET_FILE:
+			observer.sendFileList(this, input.readUTF());
+			break;
+		case SEND_FILE:
+			downloadFile();
+			break;
+		case USERS:
+			break;
+		case USER_NAME:
+			name = input.readUTF();
+			observer.update(this);
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	public void execute() {
+		String request;
+		try {
+			request = input.readUTF();
+			if (request != null) {
+				managerRequest(request);
+			}
+		} catch (IOException e) {
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage() + " IP: " + getInetAddress() + " User: " + name);
+			observer.removeConnection(this);
+			stop();
+		}
+	}
+
+	public String getInetAddress() {
+		return socket.getInetAddress().getHostAddress();
+	}
+
+	@Override
+	public void addObserver(IObserver observer) {
+		this.observer = observer;
+	}
+
+	@Override
+	public void removeObserver(IObserver observer) {
+		observer = null;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	public File getFileList() {
+		return fileList;
+	}
+}
