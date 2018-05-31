@@ -50,19 +50,10 @@ public class ManagerUser extends MyThread implements IObservable {
 		}
 	}
 
-	public void getFile(String response) throws IOException {
-		File file = null;
-		file = new File(user.getName() + "/" + input.readUTF());
+	public void readFile(File file) throws IOException {
 		byte[] fileArray = new byte[input.readInt()];
 		input.readFully(fileArray);
 		writeFile(file, fileArray);
-		if (response.equals(Request.GET_FILE.toString())) {
-			user.setFileList(FileManager.loadFiles(file));
-			iObserver.userListFile();
-		} else if (response.equals(Request.USERS.toString())) {
-			user.setUsers(FileManager.loadFiles(file));
-			iObserver.newUser();
-		}
 	}
 
 	private void writeFile(File file, byte[] array) throws IOException {
@@ -74,7 +65,7 @@ public class ManagerUser extends MyThread implements IObservable {
 	private void sendFile() throws IOException {
 		output.writeUTF(Request.SEND_FILE.toString());
 		FileManager.saveFiles(user.getName(), user.getRootDirectory());
-		File file = new File(user.getName() + "/" + ConstantList.MY_FILES);
+		File file = new File(user.getName() + "/" + user.getName() + ConstantList.MY_FILES);
 		byte[] array = new byte[(int) file.length()];
 		readFileBytes(file, array);
 		output.writeUTF(ConstantList.MY_FILES);
@@ -97,16 +88,16 @@ public class ManagerUser extends MyThread implements IObservable {
 	private void responseManager(String response) throws IOException {
 		switch (Request.valueOf(response)) {
 		case GET_FILE:
-			getFile(response);
+			downloadFileList();
 			break;
 		case SEND_FILE:
 			sendFile();
 			break;
 		case USERS:
-			getFile(response);
+			downloadUsers();
 			break;
 		case DOWNLOAD_FILE:
-			getFile(response);
+			downloadUserFile();
 			break;
 		case USER_NAME:
 			break;
@@ -114,6 +105,27 @@ public class ManagerUser extends MyThread implements IObservable {
 			shareFile(input.readUTF());
 			break;
 		}
+	}
+
+	private void downloadUserFile() throws IOException {
+		File file = new File(user.getName() + "/" + input.readUTF());
+		readFile(file);
+	}
+
+	private void downloadUsers() throws IOException {
+		File file = new File(user.getName() + "/" + input.readUTF());
+		readFile(file);
+		user.setUsers(FileManager.loadFiles(file));
+		iObserver.newUser();
+	}
+
+	private void downloadFileList() throws IOException {
+		File file = new File(user.getName() + "/" + ConstantList.FILES_LIST);
+		System.out.println(input.readUTF());
+		readFile(file);
+		user.setFileList(FileManager.loadFiles(file));
+		iObserver.userListFile();
+		
 	}
 
 	private void shareFile(String filePath) throws IOException {
@@ -124,6 +136,7 @@ public class ManagerUser extends MyThread implements IObservable {
 		output.writeUTF(filePath);
 		output.writeInt(array.length);
 		output.write(array);
+		System.out.println("Archivo compartido: " + file.getName());
 	}
 
 	@Override

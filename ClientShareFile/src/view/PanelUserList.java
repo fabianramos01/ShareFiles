@@ -28,8 +28,8 @@ public class PanelUserList extends JPanel {
 		comboBoxUsers.setModel(comboList);
 		comboBoxUsers.setFont(ConstantList.AGENCY_FB);
 		add(comboBoxUsers);
-		add(UtilityList.createJButtonText(Command.COMMAND_CHANGE_IP.getCommand(), "Seleccionar", Color.WHITE, Color.BLACK,
-				ConstantList.AGENCY_FB, listener));
+		add(UtilityList.createJButtonText(Command.COMMAND_SELCET_USER.getCommand(),
+				Command.COMMAND_SELCET_USER.getTitle(), Color.WHITE, Color.BLUE, ConstantList.AGENCY_FB, listener));
 	}
 
 	public void refreshUserList(ArrayList<String> users) {
@@ -44,7 +44,7 @@ public class PanelUserList extends JPanel {
 		comboBoxUsers.setModel(comboList);
 		revalidate();
 	}
-	
+
 	public String getSelectedUser() {
 		return comboBoxUsers.getSelectedItem().toString();
 	}

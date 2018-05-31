@@ -15,7 +15,7 @@ public class User {
 		this.name = name;
 		this.rootDirectory = rootDirectory;
 	}
-	
+
 	public File getFile(String fileName) {
 		for (File file : rootDirectory.listFiles()) {
 			if (fileName.equals(file.getName())) {

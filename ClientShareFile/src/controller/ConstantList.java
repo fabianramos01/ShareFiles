@@ -8,7 +8,7 @@ public class ConstantList {
 	public static final String APP_NAME = "ShareFiles";
 	public static final String APP_ICON = "/data/appIcon.png";
 	public static final Color APP_COLOR = Color.decode("#F7C600");
-	public static final int WIDTH_FRAME = 600;
+	public static final int WIDTH_FRAME = 730;
 	public static final int HEIGHT_FRAME = 700;
 	
 	public static final Font AGENCY_FB = new Font("Agency FB", Font.BOLD, 35);
@@ -30,4 +30,5 @@ public class ConstantList {
 	public static final String NOT_USERS_CONN = "No hay usuarios conectados";
 	public static final Object USER_NAME = "Nombre de usuario";
 	public static final String USER_LIST = "Lista de ususarios";
+	public static final String FILES_LIST = "fileList.xml";
 }

@@ -27,7 +27,7 @@ public class FileManager {
 			}
 		}
 		try {
-			FileWriter fileWriter = new FileWriter(user + "/" + ConstantList.MY_FILES);
+			FileWriter fileWriter = new FileWriter(user + "/" + user + ConstantList.MY_FILES);
 			XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
 			xmlOutputter.setFormat(Format.getCompactFormat());
 			xmlOutputter.output(doc, fileWriter);

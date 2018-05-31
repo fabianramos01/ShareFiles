@@ -72,14 +72,12 @@ public class Connection extends MyThread implements IObservable {
 		output.writeUTF(file.getName());
 		output.writeInt(array.length);
 		output.write(array);
-
 	}
 
 	private void downloadFile(File file) throws IOException {
 		byte[] fileArray = new byte[input.readInt()];
 		input.readFully(fileArray);
 		writeFile(file, fileArray);
-		System.out.println(file.getName());
 	}
 	
 	private void writeFile(File file, byte[] array) throws IOException {
@@ -123,10 +121,13 @@ public class Connection extends MyThread implements IObservable {
 	
 	private void downLoadShareFile(String userName, String fileName) {
 		observer.downloadFile(this, userName, fileName);
-//		File file = new File(fileName);
+		File file = new File(userName + "-" + fileName);
 		try {
+			while (!file.exists()) {
+				System.out.println("No existe el archivo " + file.getName());
+			}
 			output.writeUTF(Request.DOWNLOAD_FILE.toString());
-//			sendFile(file);
+			sendFile(file);
 		} catch (IOException e) {
 			ConstantList.LOGGER.log(Level.WARNING, e.getMessage() + "");
 		}

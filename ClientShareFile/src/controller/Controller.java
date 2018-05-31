@@ -55,17 +55,21 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 		switch (Command.valueOf(e.getActionCommand())) {
 		case COMMAND_CHANGE_IP:
 //			connect();
-			managerUser.requestFiles(frameHome.getSelectedUser());
 			break;
 		case COMMAND_DOWNLOAD_FILE:
 			download();
+			break;
+		case COMMAND_SELCET_USER:
+			managerUser.requestFiles(frameHome.getSelectedUser());
 			break;
 		}
 	}
 
 	private void download() {
 		try {
-			managerUser.downloadFile(frameHome.getSelectedUser(), frameHome.getFileName());
+			if (frameHome.getFileName() != null) {				
+				managerUser.downloadFile(frameHome.getSelectedUser(), frameHome.getFileName());
+			}
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
