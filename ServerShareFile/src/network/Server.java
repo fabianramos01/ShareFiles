@@ -58,6 +58,9 @@ public class Server extends MyThread implements IObserver {
 	@Override
 	public void removeConnection(Connection connection) {
 		connections.remove(connection);
+		for (Connection actual : connections) {
+			sendUsersList(actual);
+		}
 	}
 
 	@Override

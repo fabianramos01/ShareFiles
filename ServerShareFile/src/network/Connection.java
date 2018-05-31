@@ -75,11 +75,11 @@ public class Connection extends MyThread implements IObservable {
 
 	}
 
-	private void downloadFile() throws IOException {
-		fileList = new File(name + "-" + input.readUTF());
+	private void downloadFile(File file) throws IOException {
 		byte[] fileArray = new byte[input.readInt()];
 		input.readFully(fileArray);
-		writeFile(fileList, fileArray);
+		writeFile(file, fileArray);
+		System.out.println(file.getName());
 	}
 	
 	private void writeFile(File file, byte[] array) throws IOException {
@@ -103,7 +103,8 @@ public class Connection extends MyThread implements IObservable {
 			observer.sendFileList(this, input.readUTF());
 			break;
 		case SEND_FILE:
-			downloadFile();
+			fileList = new File(name + "-" + input.readUTF());
+			downloadFile(fileList);
 			break;
 		case USERS:
 			break;
@@ -115,19 +116,19 @@ public class Connection extends MyThread implements IObservable {
 			downLoadShareFile(input.readUTF(), input.readUTF());
 			break;
 		case SHARE_FILE:
-			downloadFile();
+			downloadFile(new File(name + "-" + input.readUTF()));
 			break;
 		}
 	}
 	
 	private void downLoadShareFile(String userName, String fileName) {
 		observer.downloadFile(this, userName, fileName);
-		File file = new File(fileName);
+//		File file = new File(fileName);
 		try {
 			output.writeUTF(Request.DOWNLOAD_FILE.toString());
-			sendFile(file);
+//			sendFile(file);
 		} catch (IOException e) {
-			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
+			ConstantList.LOGGER.log(Level.WARNING, e.getMessage() + "");
 		}
 	}
 
