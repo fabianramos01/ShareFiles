@@ -37,10 +37,10 @@ public class Server extends MyThread implements IObserver {
 	}
 
 	private void sendUsersList(Connection connection) {
-		ArrayList<String> users = new ArrayList<>();
+		ArrayList<Connection> users = new ArrayList<>();
 		for (Connection actual : connections) {
 			if (!(connection == actual)) {
-				users.add(actual.getName());
+				users.add(actual);
 			}
 		}
 		connection.sendUsers(connection.getName() + ConstantList.USERS_FILE, users);

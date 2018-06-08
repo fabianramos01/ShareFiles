@@ -12,6 +12,7 @@ import javax.swing.JScrollPane;
 import controller.Command;
 import controller.ConstantList;
 import controller.Controller;
+import model.User;
 
 public class FrameHome extends JFrame {
 
@@ -34,6 +35,7 @@ public class FrameHome extends JFrame {
 	}
 
 	private void init() {
+		setJMenuBar(new MenuBarUser(listener));
 		panelUserList = new PanelUserList(listener);
 		add(panelUserList, BorderLayout.NORTH);
 		fileList = new JList<>();
@@ -44,7 +46,7 @@ public class FrameHome extends JFrame {
 				BorderLayout.SOUTH);
 	}
 
-	public void refreshUserList(ArrayList<String> users) {
+	public void refreshUserList(ArrayList<User> users) {
 		panelUserList.refreshUserList(users);
 		revalidate();
 	}
@@ -58,7 +60,7 @@ public class FrameHome extends JFrame {
 		revalidate();
 	}
 
-	public String getSelectedUser() {
+	public User getSelectedUser() {
 		return panelUserList.getSelectedUser();
 	}
 

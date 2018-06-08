@@ -11,6 +11,7 @@ import java.net.Socket;
 import controller.ConstantList;
 import model.MyThread;
 import model.User;
+import model.Client;
 import persistence.FileManager;
 
 public class ManagerUser extends MyThread implements IObservable {
@@ -18,22 +19,25 @@ public class ManagerUser extends MyThread implements IObservable {
 	private Socket socket;
 	private DataOutputStream output;
 	private DataInputStream input;
-	private User user;
+	private Client client;
+	private LocalServer localServer;
 	private IObserver iObserver;
 
-	public ManagerUser(String ip, int port, String name, File file) throws IOException {
+	public ManagerUser(String ip, int port, String name, int myPort, File file) throws IOException {
 		super("", ConstantList.SLEEP);
 		socket = new Socket(ip, port);
 		output = new DataOutputStream(socket.getOutputStream());
 		input = new DataInputStream(socket.getInputStream());
-		newUser(name, file);
+		newUser(name, myPort, file);
+		localServer = new LocalServer(client);
 		start();
 	}
 
-	private void newUser(String name, File file) throws IOException {
-		user = new User(name, file);		
+	private void newUser(String name, int myPort, File file) throws IOException {
+		client = new Client(name, myPort, file);		
 		output.writeUTF(Request.USER_NAME.toString());
 		output.writeUTF(name);
+		output.writeInt(myPort);
 		File root = new File(name);
 		root.mkdirs();
 		sendFile();
@@ -64,8 +68,8 @@ public class ManagerUser extends MyThread implements IObservable {
 
 	private void sendFile() throws IOException {
 		output.writeUTF(Request.SEND_FILE.toString());
-		FileManager.saveFiles(user.getName(), user.getRootDirectory());
-		File file = new File(user.getName() + "/" + user.getName() + ConstantList.MY_FILES);
+		FileManager.saveFiles(client.getName(), client.getRootDirectory());
+		File file = new File(client.getName() + "/" + client.getName() + ConstantList.MY_FILES);
 		byte[] array = new byte[(int) file.length()];
 		readFileBytes(file, array);
 		output.writeUTF(ConstantList.MY_FILES);
@@ -108,29 +112,34 @@ public class ManagerUser extends MyThread implements IObservable {
 	}
 
 	private void downloadUserFile() throws IOException {
-		File file = new File(user.getName() + "/" + input.readUTF());
+		File file = new File(client.getName() + "/" + input.readUTF());
 		readFile(file);
+		iObserver.downloadFile();
 	}
 
 	private void downloadUsers() throws IOException {
-		File file = new File(user.getName() + "/" + input.readUTF());
+		File file = new File(client.getName() + "/" + input.readUTF());
 		readFile(file);
-		user.setUsers(FileManager.loadFiles(file));
+		client.setUsers(FileManager.loadUsersFile(file));
 		iObserver.newUser();
+	}
+	
+	private void downloadDirectFile(User user) {
+		// TODO Auto-generated method stub
+
 	}
 
 	private void downloadFileList() throws IOException {
-		File file = new File(user.getName() + "/" + ConstantList.FILES_LIST);
+		File file = new File(client.getName() + "/" + ConstantList.FILES_LIST);
 		System.out.println(input.readUTF());
 		readFile(file);
-		user.setFileList(FileManager.loadFiles(file));
+		client.setFileList(FileManager.loadFiles(file));
 		iObserver.userListFile();
-		
 	}
 
 	private void shareFile(String filePath) throws IOException {
 		output.writeUTF(Request.SHARE_FILE.toString());
-		File file = user.getFile(filePath);
+		File file = client.getFile(filePath);
 		byte[] array = new byte[(int) file.length()];
 		readFileBytes(file, array);
 		output.writeUTF(filePath);
@@ -149,12 +158,13 @@ public class ManagerUser extends MyThread implements IObservable {
 			}
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
+			localServer.stop();
 			stop();
 		}
 	}
 
-	public User getUser() {
-		return user;
+	public Client getUser() {
+		return client;
 	}
 
 	@Override

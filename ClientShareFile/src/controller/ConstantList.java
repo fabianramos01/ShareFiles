@@ -28,7 +28,19 @@ public class ConstantList {
 	public static final String MY_FILES = "MyFiles.xml";
 	public static final String USER_FILES = "OtherUserFiles.xml";
 	public static final String NOT_USERS_CONN = "No hay usuarios conectados";
-	public static final Object USER_NAME = "Nombre de usuario";
+	public static final String USER_NAME = "Nombre de usuario";
 	public static final String USER_LIST = "Lista de ususarios";
 	public static final String FILES_LIST = "fileList.xml";
+	
+	public static final String DOWNLOAD_FILE = "Archivo";
+	public static final String DOWNLOAD_FILE_MESS = "Descarga exitosa";
+	public static final String DURATION = "Tardo ";
+	public static final String TIME_UNITS = " mSeg";
+	public static final String GET_LOCAL_PORT = "Puerto local";
+	
+	
+	public static final String USER = "User";
+	public static final String USER_NAME_ELEM = "UserName";
+	public static final String IP = "Ip";
+	public static final String PORT = "Port";
 }

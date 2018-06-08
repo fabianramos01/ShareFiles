@@ -14,6 +14,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import controller.ConstantList;
+import model.User;
 
 public class FileManager {
 
@@ -46,6 +47,28 @@ public class FileManager {
 	        List<Element> userFileList = ((org.jdom2.Element) rootNode).getChildren(ConstantList.FILE);
 	        for (Element matchElement : userFileList) {
 	            users.add(matchElement.getText());
+	        }
+	    }catch (IOException io) {
+	        System.err.println(io.getMessage());
+	    }catch (JDOMException jdomex) {
+	        System.err.println(jdomex.getMessage());
+	    }
+		return users;
+	}
+	
+	public static ArrayList<User> loadUsersFile(File file) {
+		ArrayList<User> users = new ArrayList<User>();
+		SAXBuilder builder = new SAXBuilder();
+	    try {
+	        Document document = (Document) builder.build(file);
+	        Element rootNode = (Element) ((org.jdom2.Document) document).getRootElement();
+	        List<Element> userFileList = ((org.jdom2.Element) rootNode).getChildren(ConstantList.USER);
+	        for (Element matchElement : userFileList) {
+	        	String userName = matchElement.getChildTextTrim(ConstantList.USER_NAME_ELEM);
+	        	String ip = matchElement.getChildTextTrim(ConstantList.IP);
+	        	String port = matchElement.getChildTextTrim(ConstantList.PORT);
+	        	System.out.println(userName + ip + port);
+	            users.add(new User(userName, ip, Integer.parseInt(port)));
 	        }
 	    }catch (IOException io) {
 	        System.err.println(io.getMessage());

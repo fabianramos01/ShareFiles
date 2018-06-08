@@ -12,4 +12,8 @@ public class ConstantList {
 	public static final String FILES = "Files";
 	public static final String FILE = "File";
 	public static final String USERS_FILE = "usersFiles.xml";
+	public static final String USER_NAME = "UserName";
+	public static final String IP = "Ip";
+	public static final String PORT = "Port";
+	public static final String USER = "User";
 }

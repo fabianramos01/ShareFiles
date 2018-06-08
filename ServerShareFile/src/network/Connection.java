@@ -17,11 +17,12 @@ public class Connection extends MyThread implements IObservable {
 
 	private static int count = 0;
 	private String name;
+	private int port;
+	private File fileList;
 	private IObserver observer;
 	private DataInputStream input;
 	private DataOutputStream output;
 	private Socket socket;
-	private File fileList;
 
 	public Connection(Socket socket) {
 		super(String.valueOf(count++), 1000);
@@ -35,7 +36,7 @@ public class Connection extends MyThread implements IObservable {
 		start();
 	}
 
-	public void sendUsers(String path, ArrayList<String> users) {
+	public void sendUsers(String path, ArrayList<Connection> users) {
 		try {
 			output.writeUTF(Request.USERS.toString());
 			FileManager.saveFile(path, users);
@@ -107,8 +108,7 @@ public class Connection extends MyThread implements IObservable {
 		case USERS:
 			break;
 		case USER_NAME:
-			name = input.readUTF();
-			observer.update(this);
+			userInfo();
 			break;
 		case DOWNLOAD_FILE:
 			downLoadShareFile(input.readUTF(), input.readUTF());
@@ -117,6 +117,12 @@ public class Connection extends MyThread implements IObservable {
 			downloadFile(new File(name + "-" + input.readUTF()));
 			break;
 		}
+	}
+	
+	private void userInfo() throws IOException {
+		name = input.readUTF();
+		port = input.readInt();
+		observer.update(this);
 	}
 	
 	private void downLoadShareFile(String userName, String fileName) {
@@ -164,6 +170,10 @@ public class Connection extends MyThread implements IObservable {
 
 	public String getName() {
 		return name;
+	}
+	
+	public int getPort() {
+		return port;
 	}
 	
 	public File getFileList() {

@@ -4,7 +4,7 @@ import javax.swing.ImageIcon;
 
 public enum Command {
 
-	COMMAND_CHANGE_IP("COMMAND_CHANGE_IP", "Cambiar la IP" , ""),
+	COMMAND_CONNECT("COMMAND_CONNECT", "Conetarse" , ""),
 	COMMAND_SELCET_USER("COMMAND_SELCET_USER", "Seleccionar" , ""),
 	COMMAND_DOWNLOAD_FILE("COMMAND_DOWNLOAD_FILE", "Descargar archivo" , "/data/download.png");
 	
