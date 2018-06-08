@@ -43,4 +43,7 @@ public class ConstantList {
 	public static final String USER_NAME_ELEM = "UserName";
 	public static final String IP = "Ip";
 	public static final String PORT = "Port";
+	public static final String DOWNLOAD_TYPE = "Descargar desde el ";
+	public static final String FROM_USER = "Usuario";
+	public static final String FROM_SERVER = "Servidor";
 }

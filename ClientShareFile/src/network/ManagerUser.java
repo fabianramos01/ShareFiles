@@ -10,7 +10,6 @@ import java.net.Socket;
 
 import controller.ConstantList;
 import model.MyThread;
-import model.User;
 import model.Client;
 import persistence.FileManager;
 
@@ -124,9 +123,19 @@ public class ManagerUser extends MyThread implements IObservable {
 		iObserver.newUser();
 	}
 	
-	private void downloadDirectFile(User user) {
-		// TODO Auto-generated method stub
-
+	public void downloadDirectFile(Socket socketClient, String fileName) throws IOException {
+		DataOutputStream outputStream = new DataOutputStream(socketClient.getOutputStream());
+		DataInputStream inputStream = new DataInputStream(socketClient.getInputStream());
+		outputStream.writeUTF(Request.DOWNLOAD_FILE.toString());
+		outputStream.writeUTF(fileName);
+		if (inputStream.readUTF().equals(Request.SHARE_FILE.toString())) {
+			File file = new File(client.getName() + "/" + inputStream.readUTF());
+			byte[] fileArray = new byte[inputStream.readInt()];
+			inputStream.readFully(fileArray);
+			writeFile(file, fileArray);
+			inputStream.close();
+			outputStream.close();			
+		}
 	}
 
 	private void downloadFileList() throws IOException {

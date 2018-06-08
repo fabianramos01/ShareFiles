@@ -37,8 +37,10 @@ public class LocalServer extends MyThread {
 	private void shareFile(Socket socket) throws IOException {
 		DataInputStream inputStream = new DataInputStream(socket.getInputStream());
 		DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-		File file = client.getFile(inputStream.readUTF());
-		sendFile(file, outputStream);
+		if (inputStream.readUTF().equals(Request.DOWNLOAD_FILE.toString())) {
+			File file = client.getFile(inputStream.readUTF());			
+			sendFile(file, outputStream);
+		}
 	}
 
 	public void sendFile(File file, DataOutputStream output) throws IOException {
@@ -48,6 +50,7 @@ public class LocalServer extends MyThread {
 		output.writeUTF(client.getName() + file.getName());
 		output.writeInt(array.length);
 		output.write(array);
+		System.out.println("Enviado");
 	}
 
 	private void readFileBytes(File file, byte[] array) throws IOException {

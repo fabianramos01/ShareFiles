@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.net.Socket;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -58,7 +59,7 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 			connect();
 			break;
 		case COMMAND_DOWNLOAD_FILE:
-			download();
+			downloadOption();
 			break;
 		case COMMAND_SELCET_USER:
 			managerUser.requestFiles(frameHome.getSelectedUser().getName());
@@ -66,7 +67,30 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 		}
 	}
 
-	private void download() {
+	private void downloadOption() {
+		int option = JOptionPane.showOptionDialog(null, ConstantList.DOWNLOAD_TYPE, ConstantList.DOWNLOAD_FILE,
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+				new Object[] { ConstantList.FROM_SERVER, ConstantList.FROM_USER }, ConstantList.FROM_SERVER);
+		if (option == 0) {
+			downloadFromS();
+		} else if (option == 1) {
+			downloadFromU();
+		}
+	}
+
+	private void downloadFromU() {
+		try {
+			time = System.currentTimeMillis();
+			managerUser.downloadDirectFile(
+					new Socket(frameHome.getSelectedUser().getIp(), frameHome.getSelectedUser().getPort()),
+					frameHome.getFileName());
+			downloadFile();
+		} catch (IOException e) {
+			System.err.println(ConstantList.CONNECTION_ERROR);
+		}
+	}
+
+	private void downloadFromS() {
 		try {
 			if (frameHome.getFileName() != null) {
 				managerUser.downloadFile(frameHome.getSelectedUser().getName(), frameHome.getFileName());
@@ -93,7 +117,6 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 	@Override
 	public void userListFile() {
 		frameHome.loadFileList(managerUser.getUser().getFileList());
-
 	}
 
 	@Override
@@ -102,6 +125,5 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 		JOptionPane.showMessageDialog(null,
 				ConstantList.DOWNLOAD_FILE_MESS + "\n" + ConstantList.DURATION + duration + ConstantList.TIME_UNITS,
 				ConstantList.DOWNLOAD_FILE, JOptionPane.INFORMATION_MESSAGE);
-
 	}
 }
