@@ -47,7 +47,7 @@ public class LocalServer extends MyThread {
 		output.writeUTF(Request.SHARE_FILE.toString());
 		byte[] array = new byte[(int) file.length()];
 		readFileBytes(file, array);
-		output.writeUTF(client.getName() + file.getName());
+		output.writeUTF(client.getName() + "-" + file.getName());
 		output.writeInt(array.length);
 		output.write(array);
 		System.out.println("Enviado");

@@ -49,7 +49,7 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 	public void actionPerformed(ActionEvent e) {
 		switch (Command.valueOf(e.getActionCommand())) {
 		case COMMAND_CONNECT:
-			// connect();
+			frameHome.connect();
 			break;
 		case COMMAND_DOWNLOAD_FILE:
 			downloadOption();
