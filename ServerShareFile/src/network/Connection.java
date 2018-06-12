@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.logging.Level;
 
 import model.MyThread;
@@ -15,18 +16,19 @@ import persistence.FileManager;
 
 public class Connection extends MyThread implements IObservable {
 
-	private static int count = 0;
 	private String name;
 	private int port;
 	private File fileList;
+	private Calendar calendar;
 	private IObserver observer;
 	private DataInputStream input;
 	private DataOutputStream output;
 	private Socket socket;
 
-	public Connection(Socket socket) {
-		super(String.valueOf(count++), 1000);
+	public Connection(Socket socket, Calendar calendar) {
+		super(socket.getInetAddress().toString(), 1000);
 		this.socket = socket;
+		this.calendar = calendar;
 		try {
 			input = new DataInputStream(this.socket.getInputStream());
 			output = new DataOutputStream(this.socket.getOutputStream());
@@ -57,7 +59,7 @@ public class Connection extends MyThread implements IObservable {
 		fInputStream.read(array);
 		fInputStream.close();
 	}
-	
+
 	public void sendUsersFile(File file) {
 		try {
 			output.writeUTF(Request.GET_FILE.toString());
@@ -66,7 +68,7 @@ public class Connection extends MyThread implements IObservable {
 			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
 		}
 	}
-	
+
 	private void sendFile(File file) throws IOException {
 		byte[] array = new byte[(int) file.length()];
 		readFileBytes(file, array);
@@ -80,13 +82,13 @@ public class Connection extends MyThread implements IObservable {
 		input.readFully(fileArray);
 		writeFile(file, fileArray);
 	}
-	
+
 	private void writeFile(File file, byte[] array) throws IOException {
 		FileOutputStream fOutputStream = new FileOutputStream(file);
 		fOutputStream.write(array);
 		fOutputStream.close();
 	}
-	
+
 	public void shareFile(String filePath) {
 		try {
 			output.writeUTF(Request.SHARE_FILE.toString());
@@ -95,7 +97,7 @@ public class Connection extends MyThread implements IObservable {
 			ConstantList.LOGGER.log(Level.WARNING, e.getMessage());
 		}
 	}
-	
+
 	private void managerRequest(String request) throws IOException {
 		switch (Request.valueOf(request)) {
 		case GET_FILE:
@@ -118,13 +120,13 @@ public class Connection extends MyThread implements IObservable {
 			break;
 		}
 	}
-	
+
 	private void userInfo() throws IOException {
 		name = input.readUTF();
 		port = input.readInt();
 		observer.update(this);
 	}
-	
+
 	private void downLoadShareFile(String userName, String fileName) {
 		observer.downloadFile(this, userName, fileName);
 		File file = new File(userName + "-" + fileName);
@@ -171,12 +173,16 @@ public class Connection extends MyThread implements IObservable {
 	public String getName() {
 		return name;
 	}
-	
+
 	public int getPort() {
 		return port;
 	}
-	
+
 	public File getFileList() {
 		return fileList;
+	}
+
+	public String getConnTime() {
+		return calendar.getTime().toString();
 	}
 }

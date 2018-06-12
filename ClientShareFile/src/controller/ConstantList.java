@@ -7,9 +7,11 @@ public class ConstantList {
 	
 	public static final String APP_NAME = "ShareFiles";
 	public static final String APP_ICON = "/data/appIcon.png";
-	public static final Color APP_COLOR = Color.decode("#F7C600");
+	public static final Color APP_COLOR = Color.decode("#136EF1");
 	public static final int WIDTH_FRAME = 730;
 	public static final int HEIGHT_FRAME = 700;
+	public static final int WIDTH_FRAME_SIGN_IN = 700;
+	public static final int HEIGHT_FRAME_SIGN_IN = 400;
 	
 	public static final Font AGENCY_FB = new Font("Agency FB", Font.BOLD, 35);
 	

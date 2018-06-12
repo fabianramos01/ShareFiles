@@ -5,7 +5,9 @@ import javax.swing.ImageIcon;
 public enum Command {
 
 	COMMAND_CONNECT("COMMAND_CONNECT", "Conetarse" , ""),
+	COMMAND_ACCEPT_INFO("COMMAND_ACCEPT_INFO", "Aceptar" , ""),
 	COMMAND_SELCET_USER("COMMAND_SELCET_USER", "Seleccionar" , ""),
+	COMMAND_SHOW_FILECHOOSER("COMMAND_SHOW_FILECHOOSER", "Carpeta" , ""),
 	COMMAND_DOWNLOAD_FILE("COMMAND_DOWNLOAD_FILE", "Descargar archivo" , "/data/download.png");
 	
 	private String command;

@@ -4,10 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import network.IObserver;
@@ -22,30 +22,23 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 
 	public Controller() {
 		frameHome = new FrameHome(this);
-		connect();
 	}
 
 	private void connect() {
-		frameHome.setVisible(false);
-		String ip = JOptionPane.showInputDialog(ConstantList.GET_IP);
-		String port = JOptionPane.showInputDialog(ConstantList.GET_PORT);
-		if (!port.equals("")) {
-			newConnection(ip, Integer.parseInt(port));
+		String[] info = frameHome.getInfo();
+		if (!info[1].equals("")) {
+			newConnection(info);
 		} else {
 			JOptionPane.showMessageDialog(null, ConstantList.PORT_ERROR, ConstantList.ERROR, JOptionPane.ERROR_MESSAGE);
 		}
-		frameHome.setVisible(true);
 	}
 
-	private void newConnection(String ip, int port) {
+	private void newConnection(String[] info) {
 		try {
-			String name = JOptionPane.showInputDialog(ConstantList.USER_NAME);
-			int myPort = Integer.parseInt(JOptionPane.showInputDialog(ConstantList.GET_LOCAL_PORT));
-			JFileChooser fileChooser = new JFileChooser();
-			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			fileChooser.showOpenDialog(fileChooser);
-			managerUser = new ManagerUser(ip, port, name, myPort, fileChooser.getSelectedFile());
+			managerUser = new ManagerUser(info[0], Integer.parseInt(info[1]), info[2], Integer.parseInt(info[3]),
+					new File(info[4]));
 			managerUser.addObserver(this);
+			frameHome.init();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, ConstantList.CONNECTION_ERROR, ConstantList.ERROR,
 					JOptionPane.ERROR_MESSAGE);
@@ -56,13 +49,19 @@ public class Controller implements ActionListener, ItemListener, IObserver {
 	public void actionPerformed(ActionEvent e) {
 		switch (Command.valueOf(e.getActionCommand())) {
 		case COMMAND_CONNECT:
-			connect();
+			// connect();
 			break;
 		case COMMAND_DOWNLOAD_FILE:
 			downloadOption();
 			break;
 		case COMMAND_SELCET_USER:
 			managerUser.requestFiles(frameHome.getSelectedUser().getName());
+			break;
+		case COMMAND_SHOW_FILECHOOSER:
+			frameHome.showFileChooser();
+			break;
+		case COMMAND_ACCEPT_INFO:
+			connect();
 			break;
 		}
 	}
